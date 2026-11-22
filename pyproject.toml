@@ -1,0 +1,23 @@
+[project]
+name = "classification"
+version = "0.1.0"
+description = "Учебный ML pipeline классификации текстов: data, preprocessing, baseline, improvement, evaluation, inference"
+readme = "README.md"
+authors = [
+    { name = "Gogo Dev", email = "gogo.dev@mail.ru" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "joblib>=1.6.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.11.2",
+    "pandas>=3.1.1",
+    "scikit-learn>=1.9.1",
+]
+
+[project.scripts]
+classification = "classification:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"

@@ -221,3 +221,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Generated ML artifacts
+data/processed/*.csv
+models/*.joblib
+reports/*.csv
+reports/*.json
+reports/figures/*.png
+src/**/__pycache__/
