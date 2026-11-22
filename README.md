@@ -20,7 +20,8 @@
 ```
 .
 ├── data/
-│   ├── raw/sample.csv          # демо-датасет (text,label)
+│   ├── raw/rusentitweet.csv    # основной датасет: 3 класса тональности (text,label)
+│   ├── raw/sample.csv          # демо-датасет для smoke-test (text,label)
 │   └── processed/clean.csv     # очищенный датасет (создаётся pipeline)
 ├── models/
 │   ├── baseline.joblib         # baseline-модель
@@ -34,8 +35,10 @@
 │       ├── model_comparison.png
 │       └── confusion_matrix.png
 ├── notebooks/                  # исследования и визуализации
+│   └── classification_day01.ipynb  # EDA дня 1
 └── src/classification/
     ├── config.py                # пути и константы
+    ├── fetch_data.py            # загрузка RuSentiTweet в CSV
     ├── load_data.py             # этап 1: загрузка и проверка данных
     ├── preprocess.py            # этап 2: очистка текста
     ├── train_baseline.py        # этап 3: vectorization + baseline
@@ -66,6 +69,15 @@ uv sync
 
 Требуется Python ≥ 3.14. Зависимости: pandas, scikit-learn, matplotlib, joblib, jupyter.
 
+Подготовка данных (скачивает train-сплит RuSentiTweet, оставляет `positive`, `neutral`, `negative`):
+
+```bash
+uv run python -m classification.fetch_data
+uv run python -m classification.load_data
+```
+
+Оригинальный test-сплит авторов не используется при обучении: для оценки проект делает свой стратифицированный сплит из train.
+
 ## Запуск
 
 Весь workflow одной командой:
@@ -82,7 +94,7 @@ uv run python -m classification.preprocess
 uv run python -m classification.train_baseline
 uv run python -m classification.train_improved
 uv run python -m classification.error_analysis
-uv run python -m classification.predict "команда выиграла матч" "новый смартфон поступил в продажу"
+uv run python -m classification.predict "это просто космос, очень понравилось!" "ужасно, не рекомендую"
 ```
 
 Повторный запуск без переобучения:
@@ -94,7 +106,7 @@ uv run classification --skip-training
 Пакетное предсказание из CSV (нужна колонка `text`):
 
 ```bash
-uv run python -m classification.predict --input-file data/raw/sample.csv
+uv run python -m classification.predict --input-file data/raw/rusentitweet.csv
 ```
 
 ## Формат датасета
@@ -103,11 +115,11 @@ CSV с двумя колонками:
 
 ```csv
 text,label
-"команда выиграла финал",sport
-"компания выпустила новый продукт",business
+"это просто космос, очень понравилось!",positive
+"ужасно, не рекомендую",negative
 ```
 
-Можно заменить `data/raw/sample.csv` своим файлом или передать путь через `--path` / `--input`. Классов должно быть минимум 2, в каждом — минимум 2 примера (стратифицированный сплит). Демо-датасет содержит 60 текстов трёх классов: `sport`, `tech`, `business`.
+Основной датасет — [RuSentiTweet](https://github.com/sismetanin/rusentitweet): 8842 твита трёх классов тональности после исключения служебных меток `skip` и `speech_act`. Распределение неравномерное: `neutral` ~48%, `negative` ~30%, `positive` ~22%. Демо-файл `sample.csv` (60 текстов классов `sport`, `tech`, `business`) оставлен для smoke-test. Можно подключить свой CSV через `--path` / `--input`; классов должно быть минимум 2, в каждом — минимум 2 примера (стратифицированный сплит).
 
 ## Методика оценки
 

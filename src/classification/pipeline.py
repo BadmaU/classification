@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from .config import CLEAN_DATA_PATH, RAW_DATA_PATH
 from .error_analysis import build_error_report
@@ -9,8 +10,9 @@ from .train_baseline import train_baseline
 from .train_improved import train_improved
 
 DEMO_TEXTS = [
-    "Команда выиграла финал чемпионата и получила золотые медали",
-    "Новый процессор показал рекордные результаты в тестах производительности",
+    "это просто космос, очень понравилось!",
+    "ужасно, не рекомендую",
+    "вроде нормально, ничего особенного",
 ]
 
 
@@ -42,6 +44,9 @@ def run_pipeline(skip_training=False):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
     parser = argparse.ArgumentParser(description="Полный ML workflow классификации текстов")
     parser.add_argument(
         "--skip-training",

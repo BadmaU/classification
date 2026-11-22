@@ -9,7 +9,8 @@ MODELS_DIR = ROOT_DIR / "models"
 REPORTS_DIR = ROOT_DIR / "reports"
 FIGURES_DIR = REPORTS_DIR / "figures"
 
-RAW_DATA_PATH = RAW_DATA_DIR / "sample.csv"
+RAW_DATA_PATH = RAW_DATA_DIR / "rusentitweet.csv"
+DEMO_DATA_PATH = RAW_DATA_DIR / "sample.csv"
 CLEAN_DATA_PATH = PROCESSED_DATA_DIR / "clean.csv"
 
 BASELINE_MODEL_PATH = MODELS_DIR / "baseline.joblib"
