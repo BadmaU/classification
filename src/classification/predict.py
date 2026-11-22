@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 
 import joblib
@@ -31,6 +32,9 @@ def predict_texts(texts, model=None, model_path=BEST_MODEL_PATH):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
     parser = argparse.ArgumentParser(description="Предсказание классов для новых текстов")
     parser.add_argument("texts", nargs="*", help="Тексты в кавычках")
     parser.add_argument("--model", default=str(BEST_MODEL_PATH), help="Путь к сохранённой модели")

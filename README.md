@@ -7,7 +7,8 @@
 ## Что умеет система
 
 - загружать CSV с текстами и метками и проверять его структуру;
-- очищать тексты (нижний регистр, URL, HTML, пунктуация, лишние пробелы);
+- очищать тексты (Unicode NFKC, нижний регистр, `ё → е`, URL и `@mentions`, HTML, пунктуация, повторы символов, лишние пробелы);
+- нормализовать метки и добавлять числовой `label_id`;
 - строить TF-IDF-признаки (слово, char_wb, FeatureUnion word+char);
 - обучать baseline: TF-IDF + LogisticRegression;
 - сравнивать 3 улучшения baseline на валидации и тесте;
@@ -35,7 +36,8 @@
 │       ├── model_comparison.png
 │       └── confusion_matrix.png
 ├── notebooks/                  # исследования и визуализации
-│   └── classification_day01.ipynb  # EDA дня 1
+│   ├── classification_day01.ipynb  # EDA дня 1
+│   └── classification_day02.ipynb  # проверка очистки и меток
 └── src/classification/
     ├── config.py                # пути и константы
     ├── fetch_data.py            # загрузка RuSentiTweet в CSV
@@ -54,7 +56,7 @@
 | День | Этап | Модуль | Результат |
 |------|------|--------|-----------|
 | 1 | Загрузка и валидация датасета | `load_data.py` | проверенный DataFrame, распределение классов |
-| 2 | Предобработка текста | `preprocess.py` | `data/processed/clean.csv` |
+| 2 | Предобработка текста | `preprocess.py` | `data/processed/clean.csv` с `text`, `label`, `label_id` |
 | 3 | Baseline-модель | `train_baseline.py` | TF-IDF + LogisticRegression, метрики на тесте |
 | 4 | Улучшения и сравнение | `train_improved.py` | 3 варианта признаков/классификаторов, таблица сравнения |
 | 5 | Оценка и анализ ошибок | `error_analysis.py` | `errors.csv`, метрики по классам, confusion matrix |
@@ -69,12 +71,15 @@ uv sync
 
 Требуется Python ≥ 3.14. Зависимости: pandas, scikit-learn, matplotlib, joblib, jupyter.
 
-Подготовка данных (скачивает train-сплит RuSentiTweet, оставляет `positive`, `neutral`, `negative`):
+Подготовка данных (скачивает train-сплит RuSentiTweet, оставляет `positive`, `neutral`, `negative`, затем очищает тексты):
 
 ```bash
 uv run python -m classification.fetch_data
 uv run python -m classification.load_data
+uv run python -m classification.preprocess
 ```
+
+Этап очистки удаляет `@mentions`, URL (включая `t.co/...`), HTML, пунктуацию и повторы символов, применяет Unicode NFKC и `ё → е`, отбрасывает пустые/сломанные тексты и добавляет `label_id`: `negative=0`, `neutral=1`, `positive=2`.
 
 Оригинальный test-сплит авторов не используется при обучении: для оценки проект делает свой стратифицированный сплит из train.
 

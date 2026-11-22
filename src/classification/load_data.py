@@ -13,7 +13,9 @@ def load_dataset(path=RAW_DATA_PATH, text_col=TEXT_COL, label_col=LABEL_COL):
     if missing:
         raise ValueError(f"В датасете отсутствуют колонки: {sorted(missing)}")
 
-    df = df[[text_col, label_col]].dropna(subset=[text_col, label_col]).copy()
+    id_col = f"{label_col}_id"
+    columns = [text_col, label_col] + ([id_col] if id_col in df.columns else [])
+    df = df[columns].dropna(subset=[text_col, label_col]).copy()
     df[text_col] = df[text_col].astype(str).str.strip()
     df[label_col] = df[label_col].astype(str).str.strip()
     df = df[(df[text_col] != "") & (df[label_col] != "")].reset_index(drop=True)
