@@ -13,6 +13,7 @@
 - обучать baseline: TF-IDF + LogisticRegression;
 - сравнивать 3 улучшения baseline на валидации и тесте;
 - оценивать качество: accuracy, F1-macro, F1-weighted, classification report, confusion matrix;
+- сохранять baseline-модель, метрики, отчёт о сплите и предсказания на test set;
 - сохранять лучшую модель и отчёты через joblib/CSV/PNG;
 - анализировать ошибки и делать предсказания на новых текстах.
 
@@ -29,6 +30,8 @@
 │   └── best_model.joblib       # лучшая модель по валидации
 ├── reports/
 │   ├── baseline_metrics.json
+│   ├── baseline_report.json
+│   ├── baseline_predictions.csv
 │   ├── model_comparison.csv
 │   ├── errors.csv
 │   ├── class_metrics.csv
@@ -37,7 +40,8 @@
 │       └── confusion_matrix.png
 ├── notebooks/                  # исследования и визуализации
 │   ├── classification_day01.ipynb  # EDA дня 1
-│   └── classification_day02.ipynb  # проверка очистки и меток
+│   ├── classification_day02.ipynb  # проверка очистки и меток
+│   └── classification_day03.ipynb  # baseline и метрики на test set
 └── src/classification/
     ├── config.py                # пути и константы
     ├── fetch_data.py            # загрузка RuSentiTweet в CSV
@@ -57,7 +61,7 @@
 |------|------|--------|-----------|
 | 1 | Загрузка и валидация датасета | `load_data.py` | проверенный DataFrame, распределение классов |
 | 2 | Предобработка текста | `preprocess.py` | `data/processed/clean.csv` с `text`, `label`, `label_id` |
-| 3 | Baseline-модель | `train_baseline.py` | TF-IDF + LogisticRegression, метрики на тесте |
+| 3 | Baseline-модель | `train_baseline.py` | TF-IDF + LogisticRegression, метрики и отчёт на тесте |
 | 4 | Улучшения и сравнение | `train_improved.py` | 3 варианта признаков/классификаторов, таблица сравнения |
 | 5 | Оценка и анализ ошибок | `error_analysis.py` | `errors.csv`, метрики по классам, confusion matrix |
 | 6 | Inference | `predict.py` | предсказание для новых текстов и CSV-файла |
@@ -82,6 +86,12 @@ uv run python -m classification.preprocess
 Этап очистки удаляет `@mentions`, URL (включая `t.co/...`), HTML, пунктуацию и повторы символов, применяет Unicode NFKC и `ё → е`, отбрасывает пустые/сломанные тексты и добавляет `label_id`: `negative=0`, `neutral=1`, `positive=2`.
 
 Оригинальный test-сплит авторов не используется при обучении: для оценки проект делает свой стратифицированный сплит из train.
+
+### Baseline (День 3)
+
+`TfidfVectorizer` (word unigrams, `min_df=1`) + `LogisticRegression(max_iter=1000, random_state=42)`. Стратифицированный сплит 75/25: 6629 train / 2210 test. Точка отсчёта на test set: accuracy `0.5995`, F1-macro `0.5389`, F1-weighted `0.5765`.
+
+Результаты сохранены в `models/baseline.joblib`, `reports/baseline_metrics.json`, `reports/baseline_report.json` (конфигурация и сплит), `reports/baseline_predictions.csv` (prediction + confidence) и строке `baseline_tfidf_logreg` файла `reports/model_comparison.csv`. Воспроизведение: `uv run python -m classification.train_baseline`.
 
 ## Запуск
 
